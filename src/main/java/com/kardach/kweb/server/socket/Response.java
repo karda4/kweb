@@ -1,4 +1,4 @@
-package com.kardach.k.web.server.socket;
+package com.kardach.kweb.server.socket;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

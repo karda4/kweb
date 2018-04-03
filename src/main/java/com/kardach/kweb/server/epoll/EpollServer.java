@@ -1,26 +1,25 @@
-package com.kardach.k.web.server.epoll;
+package com.kardach.kweb.server.epoll;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.nio.ByteBuffer;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.nio.channels.spi.SelectorProvider;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Set;
 
-import com.kardach.k.web.server.IServer;
+import com.kardach.kweb.server.IServer;
+import com.kardach.kweb.server.Request;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class EpollServer implements IServer {
 
-	private static final int DEFAULT_BUFFER_SIZE = 1024;
-	
 	private final InetSocketAddress bindAddress;
 	
 	private ServerSocketChannel serverSocketChannel;
@@ -72,15 +71,14 @@ public class EpollServer implements IServer {
 						SocketChannel client = serverSocketChannel.accept();
 						log.info("Acceptable client SocketChannel: [{}]", client.socket().getLocalAddress());
 						client.configureBlocking(false);
-						SelectionKey clientKey = client.register(selector, SelectionKey.OP_READ);
-						clientKey.attach(ByteBuffer.allocate(DEFAULT_BUFFER_SIZE));
+						Request request = new Request();
+						SelectionKey clientReadKey = client.register(selector, SelectionKey.OP_READ);
+						clientReadKey.attach(request);
 					} catch (IOException e) {
 						log.error("Accept client SocketChannel.  [{}]", e.getMessage());
-					}
-					
+					}					
 				}
 				if (key.isReadable()) {
-					log.info("Readable key: " + key);
 					readSocket(key);
 				}
 			}
@@ -101,35 +99,30 @@ public class EpollServer implements IServer {
 
 	private void readSocket(SelectionKey key) {
 		SocketChannel client = (SocketChannel) key.channel();
-		ByteBuffer buffer = (ByteBuffer) key.attachment();
+		Request request = (Request) key.attachment();
 		int amount = -1;
 		try {
-			amount = client.read(buffer);
+			amount = client.read(request.getBuffer());
+			String readed = new String(request.getBuffer().array(), (request.getBuffer().position()) - amount, amount);
+			log.info("Had Read [{}] bytes: {}", amount, readed);
+//			if() {
 		} catch (IOException e) {
 			log.error("Read from client SocketChannel. [{}]", e.getMessage());
 		}
-		if (amount == -1) {
-			buffer = null;
+		if (amount == -1 || request.checkEndOfRequest()) {
+			try {
+				client.write(request.make());
+			} catch (IOException e) {
+				log.error("Write to client SocketChannel. [{}]", e.getMessage());
+			}
+			request = null;
 			try {
 				client.close();
 			} catch (IOException e) {
 				log.error("Close client SocketChannel. [{}]", e.getMessage());
 			}
+			client = null;
 			key.cancel();
-		}
-		else {
-			/*buf.flip();
-      byte[] byteArrived = new byte[buf.remaining];
-      buf.get(byteArrived,0,byteArrived.length);*/
-      // here we send byteArrived to the parser
-			
-			buffer.flip();
-			try {
-				client.write(buffer);
-			} catch (IOException e) {
-				log.error("Write to client SocketChannel. [{}]", e.getMessage());
-			}
-			buffer.clear();
 		}
 	}
 

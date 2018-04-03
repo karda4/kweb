@@ -1,4 +1,4 @@
-package com.kardach.k.web.server.socket;
+package com.kardach.kweb.server.socket;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -8,8 +8,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import com.kardach.k.web.exception.ServerException;
-import com.kardach.k.web.server.IServer;
+import com.kardach.kweb.exception.ServerException;
+import com.kardach.kweb.server.IServer;
 
 import lombok.extern.slf4j.Slf4j;
 

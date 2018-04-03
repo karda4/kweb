@@ -1,4 +1,4 @@
-package com.kardach.k.web.server;
+package com.kardach.kweb.server;
 
 public interface IServer {
 

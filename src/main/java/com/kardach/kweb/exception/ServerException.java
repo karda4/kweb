@@ -1,4 +1,4 @@
-package com.kardach.k.web.exception;
+package com.kardach.kweb.exception;
 
 import lombok.NoArgsConstructor;
 

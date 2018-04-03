@@ -1,4 +1,4 @@
-package com.kardach.k.web.server.socket;
+package com.kardach.kweb.server.socket;
 
 import java.nio.channels.SocketChannel;
 import java.util.concurrent.Callable;
