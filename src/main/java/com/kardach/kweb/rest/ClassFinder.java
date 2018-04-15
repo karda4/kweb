@@ -4,7 +4,9 @@ import java.io.File;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.ArrayList;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -18,17 +20,17 @@ public class ClassFinder {
 
   private static final String BAD_PACKAGE_ERROR = "Unable to get resources from path '%s'. Are you sure the package '%s' exists?";
 
-  public static List<Class<?>> find(String scannedPackage) {
-
+  public static Set<Class<?>> find(String scannedPackage) {
+	  
       String scannedPath = scannedPackage.replace(PKG_SEPARATOR, DIR_SEPARATOR);
       URL scannedUrl = Thread.currentThread().getContextClassLoader().getResource(scannedPath);
+      log.debug("scannedUrl: {}", scannedUrl);
       if (scannedUrl == null) {
           throw new IllegalArgumentException(String.format(BAD_PACKAGE_ERROR, scannedPath, scannedPackage));
       }
       File scannedDir = new File(scannedUrl.getFile());
-      log.info("scannedDir: {}", scannedDir);
-      log.info("scannedDir listFiles: {}", scannedDir.listFiles());
-      List<Class<?>> classes = new ArrayList<>();
+      log.info("scannedDir: {} is directory={}", scannedDir, scannedDir.isDirectory());
+      Set<Class<?>> classes = new HashSet<>();
       for (File file : scannedDir.listFiles()) {
           classes.addAll(find(file, scannedPackage));
       }
