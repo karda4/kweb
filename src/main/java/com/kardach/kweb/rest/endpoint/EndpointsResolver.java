@@ -20,7 +20,7 @@ import com.kardach.kweb.annotation.Rest;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class EndpointsGenerator {
+public class EndpointsResolver {
 
 	public static Map<String, EndpointNode> endpoints = new HashMap<>();
 
@@ -34,7 +34,7 @@ public class EndpointsGenerator {
 			Rest restAnnotation = controller.getAnnotation(Rest.class);
 			String prefixUrl = restAnnotation.url();
 			Method[] methods = controller.getDeclaredMethods();
-			Arrays.stream(methods).forEach(i -> EndpointsGenerator.addRestMethodToEndpoints(prefixUrl, i));
+			Arrays.stream(methods).forEach(i -> EndpointsResolver.addRestMethodToEndpoints(prefixUrl, controller.getClass(), i));
 		}
 	}
 
@@ -64,7 +64,7 @@ public class EndpointsGenerator {
 		return annotated;
 	}
 
-	private static void addRestMethodToEndpoints(String prefixUrl, final Method method) {
+	private static void addRestMethodToEndpoints(String prefixUrl, Class<?> controller, final Method method) {
 		final Annotation restAnnotation = getRestAnnotation(method);
 		if (restAnnotation == null) {
 			return;
@@ -82,7 +82,7 @@ public class EndpointsGenerator {
 		String value = getRestValue(method, restAnnotation);
 		String url = prefixUrl + value;
 		String[] pathParts = getPathParts(url);
-		addEndpointNode(node, 0, pathParts);
+		addEndpointNode(controller, method, node, 0, pathParts);
 
 		log.info("{} {} [method: {}]", annotationType.getSimpleName().toUpperCase(), url, method.getName());
 	}
@@ -94,8 +94,10 @@ public class EndpointsGenerator {
 	 * @param iPath
 	 * @param path
 	 */
-	private static void addEndpointNode(EndpointNode parrentNode, int iPath, String... path) {
+	private static void addEndpointNode(Class<?> controller, final Method method, EndpointNode parrentNode, int iPath, String... path) {
 		if (path == null || iPath >= path.length) {
+			parrentNode.setRestController(controller);
+			parrentNode.setRestMethod(method);
 			return;
 		}
 		final String pathElement = path[iPath];
@@ -108,7 +110,7 @@ public class EndpointsGenerator {
 			nextNode = node;
 			nextMap.put(key, nextNode);
 		}
-		addEndpointNode(nextNode, iPath + 1, path);
+		addEndpointNode(controller, method, nextNode, iPath + 1, path);
 	}
 	
 	private static String getRestValue(Method method, Annotation annotation) {

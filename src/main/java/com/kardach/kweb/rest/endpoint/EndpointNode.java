@@ -1,5 +1,6 @@
 package com.kardach.kweb.rest.endpoint;
 
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -27,6 +28,8 @@ public class EndpointNode {
 	private final Type type;
 	private Set<String> variables;
 	private String path;
+	private Class<?> restController;
+	private Method restMethod;
 
 	private Map<String, EndpointNode> next = new HashMap<>();
 
