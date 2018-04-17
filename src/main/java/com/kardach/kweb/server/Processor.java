@@ -13,7 +13,7 @@ public class Processor {
 		return instance;
 	}
 	
-	public Response<?> process(String request) {
-		return new Response<>(HttpStatus.OK);
+	public HttpResponse<?> process(String request) {
+		return new HttpResponse<>(HttpStatus.OK);
 	}
 }

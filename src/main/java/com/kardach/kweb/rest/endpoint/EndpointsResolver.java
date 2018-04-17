@@ -16,25 +16,28 @@ import com.kardach.kweb.annotation.Get;
 import com.kardach.kweb.annotation.Post;
 import com.kardach.kweb.annotation.Put;
 import com.kardach.kweb.annotation.Rest;
-import com.kardach.kweb.server.Request;
-import com.kardach.kweb.server.Response;
+import com.kardach.kweb.server.HttpRequest;
+import com.kardach.kweb.server.HttpRequestMethod;
+import com.kardach.kweb.server.HttpResponse;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class EndpointsResolver {
 
-	public static Map<String, EndpointNode> endpoints = new HashMap<>();
+	public static Map<HttpRequestMethod, EndpointNode> endpoints = new HashMap<>();
 
 	private static final List<Class<?>> restMethods = Arrays.asList(Get.class, Post.class, Put.class, Delete.class);
 	
 	/**
-	 * Resolves HTTP {@link Request} from client and returns {@link Response}
+	 * Resolves HTTP {@link HttpRequest} from client and returns {@link HttpResponse}
 	 * @param <T>
 	 * 
 	 * @param request
 	 */
-	public static <T> Response<T> resolve(Request request) {
+	public static <T> HttpResponse<T> resolve(HttpRequest request) {
+		EndpointNode endpoint = endpoints.get(request.getMethod());
+		String[] path = request.getURI().split("/");
 		return null;
 	}
 
@@ -83,12 +86,13 @@ public class EndpointsResolver {
 		}
 		
 		final Class<?> annotationType = restAnnotation.annotationType();
-		final String fullRestVerb = annotationType.getName();
+		final String httpMethod = annotationType.getSimpleName().toUpperCase();
+		final HttpRequestMethod key = HttpRequestMethod.valueOf(httpMethod);
 
-		EndpointNode node = endpoints.get(fullRestVerb);
+		EndpointNode node = endpoints.get(key);
 		if (node == null) {
 			node = new EndpointNode(null);
-			endpoints.put(fullRestVerb, node);
+			endpoints.put(key, node);
 		}
 		
 		String value = getRestValue(method, restAnnotation);

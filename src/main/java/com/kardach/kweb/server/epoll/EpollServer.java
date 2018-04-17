@@ -14,7 +14,7 @@ import java.util.Set;
 import com.kardach.kweb.rest.endpoint.EndpointsResolver;
 import com.kardach.kweb.server.HttpRequestParser;
 import com.kardach.kweb.server.IServer;
-import com.kardach.kweb.server.Request;
+import com.kardach.kweb.server.HttpRequest;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -72,7 +72,7 @@ public class EpollServer implements IServer {
 						SocketChannel client = serverSocketChannel.accept();
 						log.info("Acceptable client SocketChannel: [{}]", client.socket().getLocalAddress());
 						client.configureBlocking(false);
-						Request request = new Request();
+						HttpRequest request = new HttpRequest();
 						SelectionKey clientReadKey = client.register(selector, SelectionKey.OP_READ);
 						clientReadKey.attach(request);
 					} catch (IOException e) {
@@ -100,7 +100,7 @@ public class EpollServer implements IServer {
 
 	private void readSocket(SelectionKey key) {
 		SocketChannel client = (SocketChannel) key.channel();
-		Request request = (Request) key.attachment();
+		HttpRequest request = (HttpRequest) key.attachment();
 		int amount = -1;
 		try {
 			amount = client.read(request.getBuffer());

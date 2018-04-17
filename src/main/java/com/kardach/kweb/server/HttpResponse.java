@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 @AllArgsConstructor
 @RequiredArgsConstructor
 @Getter
-public class Response<T> {
+public class HttpResponse<T> {
 
 	private final HttpStatus status;
 	private T body;

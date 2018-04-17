@@ -16,7 +16,7 @@ public class HttpRequestParserTest {
 	
 	@Test
 	public void testParse_CompleteGetRequest() {
-		Request request = generate(GET_REQUEST_COMPLETE);
+		HttpRequest request = generate(GET_REQUEST_COMPLETE);
 		boolean result = HttpRequestParser.parse(request);
 		
 		assertTrue(result);
@@ -26,7 +26,7 @@ public class HttpRequestParserTest {
 	
 	@Test
 	public void testParse_IncompleteGetRequest() {
-		Request request = generate(GET_REQUEST_INCOMPLETE);
+		HttpRequest request = generate(GET_REQUEST_INCOMPLETE);
 		boolean result = HttpRequestParser.parse(request);
 		
 		assertFalse(result);
@@ -64,8 +64,8 @@ public class HttpRequestParserTest {
 		assertEquals(2, result);
 	}
 	
-	private Request generate(String req) {
-		Request result = new Request();
+	private HttpRequest generate(String req) {
+		HttpRequest result = new HttpRequest();
 		result.getBuffer().put(req.getBytes());
 		return result;
 	}

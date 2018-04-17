@@ -1,27 +1,39 @@
 package com.kardach.kweb.server;
 
 import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Getter
-public class Request {
+@ToString
+public class HttpRequest {
 
 	public static final int DEFAULT_BUFFER_SIZE = 1024;
 
 	private ByteBuffer buffer;
 	private Processor processor = Processor.getInstance();
 	
+	@Setter
 	private boolean completed = false;
 
 	@Setter
 	private HttpRequestMethod method;
+	@Setter
+	private String URI;
+	@Setter
+	private String httpVersion;
+	@Setter
+	private Map<String, String> headers = new HashMap<>();
+	@Setter
+	private String body;
 
-	public Request() {
+	public HttpRequest() {
 		buffer = ByteBuffer.allocate(DEFAULT_BUFFER_SIZE);
 	}
 	
@@ -34,7 +46,7 @@ public class Request {
 		return toByteBuffer(processor.process(this.toString()));
 	}
 
-	private ByteBuffer toByteBuffer(Response<?> response) {
+	private ByteBuffer toByteBuffer(HttpResponse<?> response) {
 		buffer.clear();
 
 		StringBuilder builder = new StringBuilder();
@@ -51,11 +63,6 @@ public class Request {
 		log.info("HttpResponse: {}", stringResponse);
 		buffer.put(stringResponse.getBytes());
 		return buffer;
-	}
-
-	@Override
-	public String toString() {
-		return new String(buffer.array(), StandardCharsets.UTF_8);
 	}
 
 }
