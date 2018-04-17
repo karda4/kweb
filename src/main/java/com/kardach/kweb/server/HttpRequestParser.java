@@ -1,17 +1,14 @@
 package com.kardach.kweb.server;
 
-import java.util.Arrays;
-
 public class HttpRequestParser {
 
 	public static final String HTTP_Version = "HTTP/1.1";
 	public static final String SP = " ";
 	public static final String CRLF = "\r\n";
 	public static final byte[] CONTENT_LENGTH = "Content-Length".getBytes();
-	//public static final byte[] TWICE_CRLF = (CRLF + CRLF).getBytes();
 	
-	public static boolean parse(Request request) {
-		byte[] data = request.getBuffer().array();
+	public static boolean parse(final Request request) {
+		final byte[] data = request.getBuffer().array();
 
 		final String requestLine = parseRequestLine(data);
 		if(requestLine == null) {
@@ -26,7 +23,7 @@ public class HttpRequestParser {
 		return true;
 	}
 	
-	private static String parseRequestLine(byte[] data) {
+	private static String parseRequestLine(final byte[] data) {
 		int index = find(0, data, CRLF);
 		if(index < 0) {
 			return null;
@@ -34,7 +31,7 @@ public class HttpRequestParser {
 		return new String(data, 0, index);
 	}
 
-	private static String parseHttpRequestMethod(byte[] data) {
+	private static String parseHttpRequestMethod(final byte[] data) {
 		int index = find(0, data, SP);
 		if(index < 0) {
 			return null;
@@ -42,8 +39,8 @@ public class HttpRequestParser {
 		return new String(data, 0, index);
 	}
 	
-	private static int find(int index, byte[] data, String search) {
-		return find(index, data, search.getBytes());
+	private static int find(final int index, final byte[] data, final String search) {
+		return find(data, index, search.getBytes());
 	}
 	
 	/**
@@ -54,12 +51,13 @@ public class HttpRequestParser {
 	 * @param search - searched array
 	 * @return index of position if finded or -1 otherwise
 	 */
-	private static int find(int startIndex, byte[] data, byte[] search) {
-		int dataLength = data.length;
+	private static int find(final byte[] data, final int startIndex, final byte[] search) {
+		final int dataLength = data.length;
+		final int searchLength = search.length;
 		int index;
 		int result = -1;
-		for(int i = 0; i < dataLength; i++) {
-			index = Arrays.binarySearch(data, startIndex + i, dataLength, search[i]);
+		for(int i = 0; i < searchLength; i++) {
+			index = find(data, startIndex + i, dataLength, search[i]);
 			if(index < 0) {
 				return -1;
 			}
@@ -68,5 +66,14 @@ public class HttpRequestParser {
 			}
 		}
 		return result;
+	}
+	
+	private static int find(final byte[] data, int indexFrom, int indexTo, byte key) {
+		for(int i = indexFrom; i < indexTo; i++) {
+			if(data[i] == key) {
+				return i;
+			}
+		}
+		return -1;
 	}
 }
