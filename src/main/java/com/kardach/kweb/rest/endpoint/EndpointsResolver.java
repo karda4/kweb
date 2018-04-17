@@ -16,6 +16,8 @@ import com.kardach.kweb.annotation.Get;
 import com.kardach.kweb.annotation.Post;
 import com.kardach.kweb.annotation.Put;
 import com.kardach.kweb.annotation.Rest;
+import com.kardach.kweb.server.Request;
+import com.kardach.kweb.server.Response;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -25,6 +27,16 @@ public class EndpointsResolver {
 	public static Map<String, EndpointNode> endpoints = new HashMap<>();
 
 	private static final List<Class<?>> restMethods = Arrays.asList(Get.class, Post.class, Put.class, Delete.class);
+	
+	/**
+	 * Resolves HTTP {@link Request} from client and returns {@link Response}
+	 * @param <T>
+	 * 
+	 * @param request
+	 */
+	public static <T> Response<T> resolve(Request request) {
+		return null;
+	}
 
 	public static void scan(Class<?> root) {
 		Set<Class<?>> rests = getRests(root);

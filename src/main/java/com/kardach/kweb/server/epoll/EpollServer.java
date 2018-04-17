@@ -11,6 +11,8 @@ import java.nio.channels.spi.SelectorProvider;
 import java.util.Iterator;
 import java.util.Set;
 
+import com.kardach.kweb.rest.endpoint.EndpointsResolver;
+import com.kardach.kweb.server.HttpRequestParser;
 import com.kardach.kweb.server.IServer;
 import com.kardach.kweb.server.Request;
 
@@ -102,14 +104,15 @@ public class EpollServer implements IServer {
 		int amount = -1;
 		try {
 			amount = client.read(request.getBuffer());
+			HttpRequestParser.parse(request);
 			String readed = new String(request.getBuffer().array(), (request.getBuffer().position()) - amount, amount);
-			log.info("Had Read [{}] bytes: {}", amount, readed);
-//			if() {
+			log.debug("Had Read [{}] bytes: {}", amount, readed);
 		} catch (IOException e) {
 			log.error("Read from client SocketChannel. [{}]", e.getMessage());
 		}
-		if (amount == -1 || request.checkEndOfRequest()) {
+		if (amount == -1 || request.isCompleted()) {
 			try {
+				EndpointsResolver.resolve(request);
 				client.write(request.make());
 			} catch (IOException e) {
 				log.error("Write to client SocketChannel. [{}]", e.getMessage());

@@ -1,4 +1,4 @@
-package com.kardach.k.web;
+package com.kardach.kweb;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
